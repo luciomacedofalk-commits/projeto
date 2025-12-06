@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliotech - Início</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #291930;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #554971;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .welcome {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .features {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .feature {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .feature h3 {
+            color: #291930;
+        }
+        .feature a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #554971;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .feature a:hover {
+            background-color: #6a5a90;
+        }
+                .search-bar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #554971;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #6a5a90;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bibliotech</h1>
+        <p>Biblioteca online</p>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="home.html">Início</a></li>
+            <li><a href="livros.html">Livros</a></li>
+            <li><a href="autores.html">Autores</a></li>
+            <li><a href="generos.html">Gêneros</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar livros...">
+            <button onclick="searchBooks()">Buscar</button>
+        </div>
+        <div class="books-list" id="booksList"></div>
+    </div>
+
+    <script>
+        function displayBooks(bookList) {
+            const booksList = document.getElementById('booksList');
+            booksList.innerHTML = '';
+            bookList.forEach(book => {
+                const bookItem = document.createElement('div');
+                bookItem.className = 'book-item';
+                bookItem.innerHTML = `
+                    <img src="${book.image}" alt="${book.title}">
+                    <div class="book-info">
+                        <h3>${book.title}</h3>
+                        <p><strong>Autor:</strong> ${book.author}</p>
+                        <p class="genre"><strong>Gênero:</strong> ${book.genre}</p>
+                        <p><strong>Ano:</strong> ${book.year}</p>
+                    </div>
+                `;
+                booksList.appendChild(bookItem);
+            });
+        }
+
+        function searchBooks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredBooks = books.filter(book =>
+                book.title.toLowerCase().includes(searchTerm) ||
+                book.author.toLowerCase().includes(searchTerm) ||
+                book.genre.toLowerCase().includes(searchTerm)
+            );
+            displayBooks(filteredBooks);
+        }
+        displayBooks(books);
+    </script>
+    <div class="container">
+        <div class="welcome">
+            <h2>Bem-vindo ao Bibliotech</h2>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <h3>Livros</h3>
+                <a href="livros.html">Explorar</a>
+            </div>
+            <div class="feature">
+                <h3>Autores</h3>
+                <a href="autores.html">Conhecer</a>
+            </div>
+            <div class="feature">
+                <h3>Gêneros</h3>
+                <a href="generos.html">Descobrir</a>
+            </div>
+        </div>
+    </div>
+    <footer style="text-align: center; margin-top: 40px; font-size: 12px; color: #999; padding: 10px;">
+        <p>Bibliotech é uma plataforma online de gestão e consulta de livros, projetada para facilitar o acesso organizado ao acervo de uma biblioteca digital. O site permite que usuários explorem títulos, autores e categorias de forma intuitiva, realizem buscas rápidas e acompanhem a disponibilidade das obras.
+            O projeto Bibliotech foi desenvolvido por Lucio Flávio, Yan, Sabrina e Julia.
+        </p>
+    </footer>
+</body>
+</html>

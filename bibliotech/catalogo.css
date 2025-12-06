@@ -1,0 +1,16 @@
+body{
+    background-color: #ffffff;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(#ffffff, #ffffff);
+    font-family: "Verdana", "Geneva", sans-serif;
+}
+div{
+    background-color: #554971;
+}
+nav{
+    background-color: #554971;
+}

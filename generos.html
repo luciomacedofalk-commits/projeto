@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliotech - Gêneros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #291930;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #554971;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .genre-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .genre-card h3 {
+            color: #291930;
+            margin-bottom: 10px;
+        }
+        .genre-card p {
+            margin: 5px 0;
+        }
+        .genre-card .books-count {
+            font-weight: bold;
+            color: #554971;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #554971;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #6a5a90;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bibliotech - Gêneros</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="home.html">Início</a></li>
+            <li><a href="livros.html">Livros</a></li>
+            <li><a href="autores.html">Autores</a></li>
+            <li><a href="generos.html">Gêneros</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar gêneros">
+            <button onclick="searchGenres()">Buscar</button>
+            <button onclick="toggleAddGenreForm()" style="margin-left: 10px;">+</button>
+        </div>
+        <div id="addGenreForm" class="add-genre-form" style="display: none; background-color: white; border: 2px solid #554971; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>Adicionar Novo Gênero</h3>
+            <form id="genreForm">
+                <label for="genreName">Nome do Gênero:</label>
+                <input type="text" id="genreName" name="genreName" required><br><br>
+                <button type="submit" style="background-color: #554971; color: white; border: 1px solid #554971; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Adicionar Gênero</button>
+                <button type="button" onclick="toggleAddGenreForm()" style="background-color: #554971; color: white; border: 1px solid #554971; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cancelar</button>
+            </form>
+        </div>
+        <div class="genres-grid" id="genresGrid"></div>
+    </div>
+
+    <script>
+        let genres = [];
+
+        async function getGenres() {
+            try {
+                const response = await fetch("http://localhost:3000/generos");
+                genres = await response.json();
+                displayGenres(genres);
+            } catch (error) {
+                console.error('Erro ao buscar gêneros da API:', error);
+                displayGenres([]);
+            }
+        }
+
+        function displayGenres(genreList) {
+            const genresGrid = document.getElementById('genresGrid');
+            genresGrid.innerHTML = '';
+            genreList.forEach(genre => {
+                const genreCard = document.createElement('div');
+                genreCard.className = 'genre-card';
+                genreCard.innerHTML = `
+                    <h3>${genre.name}</h3>
+                    <p class="books-count">Livros no gênero: ${genre.booksCount || 0}</p>
+                `;
+                genresGrid.appendChild(genreCard);
+            });
+        }
+
+        function searchGenres() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredGenres = genres.filter(genre =>
+                genre.name.toLowerCase().includes(searchTerm)
+            );
+            displayGenres(filteredGenres);
+        }
+
+        function toggleAddGenreForm() {
+            if (!localStorage.getItem('loggedIn')) {
+                alert('Você precisa estar logado para adicionar gêneros.');
+                window.location.href = 'login.html';
+                return;
+            }
+            const form = document.getElementById('addGenreForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.getElementById('genreForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const genreName = document.getElementById('genreName').value;
+            const genreDescription = document.getElementById('genreDescription').value;
+
+            const newGenre = {
+                name: genreName,
+                description: genreDescription,
+                booksCount: 0
+            };
+
+            try {
+                const response = await fetch("http://localhost:3000/generos/inserir", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newGenre)
+                });
+                if (response.ok) {
+                    alert('Gênero adicionado com sucesso!');
+                    this.reset();
+                    toggleAddGenreForm();
+                    getGenres();
+                } else {
+                    alert('Erro ao adicionar gênero.');
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar gênero:', error);
+                alert('Erro ao adicionar gênero.');
+            }
+        });
+
+        getGenres();
+    </script>
+</body>
+</html>

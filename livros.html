@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliotech - Livros</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #291930;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #554971;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .books-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .book-item {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .book-item img {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            margin-right: 20px;
+            border-radius: 4px;
+        }
+        .book-info h3 {
+            margin: 0 0 10px 0;
+            color: #291930;
+        }
+        .book-info p {
+            margin: 5px 0;
+        }
+        .book-info .genre {
+            font-style: italic;
+            color: #666;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #554971;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #6a5a90;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bibliotech - Livros</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="home.html">Início</a></li>
+            <li><a href="livros.html">Livros</a></li>
+            <li><a href="autores.html">Autores</a></li>
+            <li><a href="generos.html">Gêneros</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar livros...">
+            <button onclick="searchBooks()">Buscar</button>
+            <button onclick="toggleAddBookForm()" style="margin-left: 10px;">+</button>
+        </div>
+        <div id="addBookForm" class="add-book-form" style="display: none; background-color: white; border: 2px solid #554971; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3>Adicionar Novo Livro</h3>
+            <form id="bookForm" enctype="multipart/form-data">
+                <label for="title">Nome do Livro:</label>
+                <input type="text" id="title" name="title" required><br><br>
+                <label for="author">Autor:</label>
+                <input type="text" id="author" name="author" required><br><br>
+                <label for="genre">Gênero:</label>
+                <input type="text" id="genre" name="genre" required><br><br>
+                <label for="isbn">ISBN:</label>
+                <input type="text" id="isbn" name="isbn" required><br><br>
+                <label for="releaseDate">Data de Lançamento:</label>
+                <input type="date" id="releaseDate" name="releaseDate" required><br><br>
+                <label for="bookImage">Foto do Livro:</label>
+                <input type="file" id="bookImage" name="bookImage" accept="image/*"><br><br>
+                <button type="submit" style="background-color: #554971; color: white; border: 1px solid #554971; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Adicionar Livro</button>
+                <button type="button" onclick="toggleAddBookForm()" style="background-color: #554971; color: white; border: 1px solid #554971; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cancelar</button>
+            </form>
+        </div>
+        <div class="books-list" id="booksList"></div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        console.log('Token:', token);
+        let books = [];
+
+        async function getBooks() {
+            try {
+                const response = await fetch("http://localhost:3000/livros/listar", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                books = await response.json();
+                displayBooks(books);
+            } catch (error) {
+                console.error('Erro ao buscar livros da API:', error);
+                displayBooks([]);
+            }
+        }
+
+        function displayBooks(bookList) {
+            const booksList = document.getElementById('booksList');
+            booksList.innerHTML = '';
+            bookList.forEach(book => {
+                const bookItem = document.createElement('div');
+                bookItem.className = 'book-item';
+                bookItem.innerHTML = `
+                    <img src="${book.image || 'placeholder.jpg'}" alt="${book.title}">
+                    <div class="book-info">
+                        <h3>${book.title}</h3>
+                        <p><strong>Data:</strong> ${book.releaseDate || book.year}</p>
+                        <button onclick="emprestarLivro('${book.id}')" style="background-color: #554971; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px;">Empréstimo</button>
+                        <button onclick="reservarLivro('${book.id}')" style="background-color: #554971; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Reserva</button>
+                    </div>
+                `;
+                booksList.appendChild(bookItem);
+            });
+        }
+
+        function searchBooks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredBooks = books.filter(book =>
+                book.title.toLowerCase().includes(searchTerm) ||
+                book.author.toLowerCase().includes(searchTerm) ||
+                book.genre.toLowerCase().includes(searchTerm)
+            );
+            displayBooks(filteredBooks);
+        }
+
+        function toggleAddBookForm() {
+            const form = document.getElementById('addBookForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function emprestarLivro(bookId) {
+            alert(`Empréstimo solicitado para o livro ID: ${bookId}`);
+            // Aqui você pode adicionar lógica para processar o empréstimo
+        }
+
+        function reservarLivro(bookId) {
+            alert(`Reserva solicitada para o livro ID: ${bookId}`);
+            // Aqui você pode adicionar lógica para processar a reserva
+        }
+
+        document.getElementById('bookForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const releaseDate = document.getElementById('releaseDate').value;
+            formData.append('releaseDate', releaseDate);
+
+            try {
+                const response = await fetch("http://localhost:3000/livros/inserir", {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                if (response.ok) {
+                    alert('Livro adicionado com sucesso!');
+                    this.reset();
+                    toggleAddBookForm();
+                    getBooks();
+                } else {
+                    alert('Erro ao adicionar livro.');
+                }
+            } catch (error) {
+                console.error('Erro ao adicionar livro:', error);
+                alert('Erro ao adicionar livro.');
+            }
+        });
+
+   
+        getBooks();
+    </script>
+</body>
+</html>

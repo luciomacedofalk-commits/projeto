@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div>
+    <h1>
+        Login
+    </h1>
+    <form>
+    <label for="Usuario">Usuario</label><br>
+    <input type="text" id = "user1" required><br>
+
+    <label for="senha"> Senha</label><br>
+    <input type="password" id = "password1" required><br>
+
+    <input type="submit" id = "button2" value="Entrar">
+    </form>
+    <a href="cadastro.html">Ainda não possui uma conta? Cadastre-se</a>
+    </div>
+
+    <script>
+        const button3 = document.getElementById("button2");
+        button3.addEventListener("click", ()=>{
+      const user = document.getElementById("user1").value;
+    const senha = document.getElementById("password1").value;
+    if (!user || senha){
+      alert("Por favor, informe o usuario e a senha");
+    }});
+    </script>
+</body>
+</html>
