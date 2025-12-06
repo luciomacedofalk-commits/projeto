@@ -120,18 +120,18 @@
         <div id="addBookForm" class="add-book-form" style="display: none; background-color: white; border: 2px solid #554971; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
             <h3>Adicionar Novo Livro</h3>
             <form id="bookForm" enctype="multipart/form-data">
-                <label for="title">Nome do Livro:</label>
-                <input type="text" id="title" name="title" required><br><br>
-                <label for="author">Autor:</label>
-                <input type="text" id="author" name="author" required><br><br>
-                <label for="genre">Gênero:</label>
-                <input type="text" id="genre" name="genre" required><br><br>
+                <label for="titulo">Nome do Livro:</label>
+                <input type="text" id="titulo" name="titulo" required><br><br>
+                <label for="autor">Autor:</label>
+                <input type="text" id="autor" name="autor" required><br><br>
+                <label for="genero">Gênero:</label>
+                <input type="text" id="genero" name="genero" required><br><br>
                 <label for="isbn">ISBN:</label>
                 <input type="text" id="isbn" name="isbn" required><br><br>
-                <label for="releaseDate">Data de Lançamento:</label>
-                <input type="date" id="releaseDate" name="releaseDate" required><br><br>
+                <label for="ano_publicacao">Data de Lançamento:</label>
+                <input type="date" id="ano_publicacao" name="ano_publicacao" required><br><br>
                 <label for="bookImage">Foto do Livro:</label>
-                <input type="file" id="bookImage" name="bookImage" accept="image/*"><br><br>
+                <input type="file" id="foto" name="foto" accept="image/*"><br><br>
                 <button type="submit" style="background-color: #554971; color: white; border: 1px solid #554971; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Adicionar Livro</button>
                 <button type="button" onclick="toggleAddBookForm()" style="background-color: #554971; color: white; border: 1px solid #554971; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Cancelar</button>
             </form>
@@ -146,12 +146,14 @@
 
         async function getBooks() {
             try {
-                const response = await fetch("http://localhost:3000/livros/listar", {
+                const response = await fetch("http://localhost:8080/livros/listar", {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
                 books = await response.json();
+                console.log(books);
+                
                 displayBooks(books);
             } catch (error) {
                 console.error('Erro ao buscar livros da API:', error);
@@ -163,13 +165,15 @@
             const booksList = document.getElementById('booksList');
             booksList.innerHTML = '';
             bookList.forEach(book => {
+                console.log(book);
+                
                 const bookItem = document.createElement('div');
                 bookItem.className = 'book-item';
                 bookItem.innerHTML = `
-                    <img src="${book.image || 'placeholder.jpg'}" alt="${book.title}">
+                    <img src="${book.foto || 'placeholder.jpg'}" alt="${book.titulo}">
                     <div class="book-info">
-                        <h3>${book.title}</h3>
-                        <p><strong>Data:</strong> ${book.releaseDate || book.year}</p>
+                        <h3>${book.titulo}</h3>
+                        <p><strong>Data:</strong> ${book.ano_publicacao}</p>
                         <button onclick="emprestarLivro('${book.id}')" style="background-color: #554971; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px;">Empréstimo</button>
                         <button onclick="reservarLivro('${book.id}')" style="background-color: #554971; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Reserva</button>
                     </div>
@@ -210,12 +214,12 @@
             formData.append('releaseDate', releaseDate);
 
             try {
-                const response = await fetch("http://localhost:3000/livros/inserir", {
+                const response = await fetch("http://localhost:8080/livros/inserir", {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`
                     },
-                    body: formData
+                    body: JSON.stringify(Object.fromEntries(formData)),
                 });
                 if (response.ok) {
                     alert('Livro adicionado com sucesso!');

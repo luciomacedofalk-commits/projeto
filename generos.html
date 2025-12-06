@@ -126,7 +126,7 @@
 
         async function getGenres() {
             try {
-                const response = await fetch("http://localhost:3000/generos");
+                const response = await fetch("http://localhost:8080/generos/listar");
                 genres = await response.json();
                 displayGenres(genres);
             } catch (error) {
@@ -179,7 +179,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:3000/generos/inserir", {
+                const response = await fetch("http://localhost:8080/generos/inserir", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

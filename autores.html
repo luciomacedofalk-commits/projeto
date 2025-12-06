@@ -140,7 +140,7 @@
 
     <script>
         async function getAuthors() {
-            const response = await fetch("http://localhost:3000/autores");
+            const response = await fetch("http://localhost:8080/autores");
             const data = await response.json();
             displayAuthors(data);
         }
@@ -199,7 +199,7 @@
             };
 
             try {
-                const response = await fetch("http://localhost:3000/autores/inserir", {
+                const response = await fetch("http://localhost:8080/autores/inserir", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
